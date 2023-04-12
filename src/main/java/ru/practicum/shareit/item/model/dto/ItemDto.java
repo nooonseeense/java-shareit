@@ -1,7 +1,6 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.model.dto;
 
 import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
 
 @Getter
 @Setter
@@ -9,11 +8,10 @@ import ru.practicum.shareit.request.ItemRequest;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Item {
+public class ItemDto {
     private Long id;
     private String name;
     private String description;
     private boolean isAvailable;
-    private String owner;
-    private ItemRequest request;
+    private Long requestId;
 }
