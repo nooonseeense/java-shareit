@@ -16,7 +16,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping(path = "/users")
 public class UserController {
     private final UserService userService;
 
@@ -38,10 +38,11 @@ public class UserController {
         return userService.create(userDto);
     }
 
-    @PutMapping
-    public UserDto update(@Valid @RequestBody UserDto userDto) {
-        log.info("Запрос PUT: update(UserDto userDto) на изменение пользователя.");
-        return userService.update(userDto);
+    @PatchMapping("{id}")
+    public UserDto update(@PathVariable Long id,
+                          @Valid @RequestBody UserDto userDto) {
+        log.info("Запрос PATCH: update(Long id, UserDto userDto) на изменение пользователя.");
+        return userService.update(id, userDto);
     }
 
     @DeleteMapping("{id}")

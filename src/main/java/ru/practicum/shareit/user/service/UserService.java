@@ -43,7 +43,6 @@ public class UserService {
      * @return созданный объект пользователя
      */
     public UserDto create(UserDto userDto) {
-
         return UserMapper.toUserDto(userRepository.create(userDto));
     }
 
@@ -53,8 +52,8 @@ public class UserService {
      * @param userDto Принятый объект пользователя
      * @return изменённый объект пользователя
      */
-    public UserDto update(UserDto userDto) {
-        return UserMapper.toUserDto(userRepository.update(userDto));
+    public UserDto update(Long id, UserDto userDto) {
+        return UserMapper.toUserDto(userRepository.update(id, userDto));
     }
 
     /**

@@ -20,6 +20,13 @@ public class ErrorHandler {
         return Map.of(ERROR, e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleUserEmailValidationException(final UserEmailValidationException e) {
+        log.warn("Ошибка при валидации email пользователя.");
+        return Map.of(ERROR, e.getMessage());
+    }
+
     @ExceptionHandler({ObjectDoesNotExist.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleObjectDoesNotExistException(final ObjectDoesNotExist e) {
