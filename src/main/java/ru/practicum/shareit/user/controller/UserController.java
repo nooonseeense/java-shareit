@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
@@ -18,36 +18,36 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 public class UserController {
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @GetMapping
     public List<User> get() {
         log.info("Запрос GET: get() на получение списка всех пользователей.");
-        return userService.get();
+        return userServiceImpl.get();
     }
 
     @GetMapping("{id}")
     public UserDto get(@PositiveOrZero @PathVariable Long id) {
         log.info("Запрос GET: get(Long id) на получение пользователя по ID = {}.", id);
-        return userService.get(id);
+        return userServiceImpl.get(id);
     }
 
     @PostMapping()
     public UserDto create(@Valid @RequestBody UserDto userDto) {
         log.info("Запрос POST: create(UserDto userDto) на создание пользователя.");
-        return userService.create(userDto);
+        return userServiceImpl.create(userDto);
     }
 
     @PatchMapping("{id}")
     public UserDto update(@PathVariable Long id,
                           @Valid @RequestBody UserDto userDto) {
         log.info("Запрос PATCH: update(Long id, UserDto userDto) на изменение пользователя.");
-        return userService.update(id, userDto);
+        return userServiceImpl.update(id, userDto);
     }
 
     @DeleteMapping("{id}")
     public void delete(@PositiveOrZero @PathVariable Long id) {
         log.info("Запрос DELETE: delete(Long id) на удаление пользователя с ID = {}.", id);
-        userService.delete(id);
+        userServiceImpl.delete(id);
     }
 }
