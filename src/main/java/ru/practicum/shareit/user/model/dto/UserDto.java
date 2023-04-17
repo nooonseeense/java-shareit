@@ -13,9 +13,9 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode
 public class UserDto {
     private Long id;
-    @NotBlank(message = "Имя не может быть пустым.")
+    @NotBlank
     private String name;
-    @Email(message = "Электронная почта не может быть пустой и должна содержать символ @.")
+    @Email
     @NotBlank
     private String email;
 }

@@ -1,38 +1,67 @@
 package ru.practicum.shareit.item.repository;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.model.dto.ItemDto;
+import ru.practicum.shareit.exception.ObjectDoesNotExist;
+import ru.practicum.shareit.item.model.Item;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
-@RequiredArgsConstructor
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
+    private final Map<Long, Item> items = new HashMap<>();
+    private Long itemId = 1L;
+
     @Override
-    public List<ItemDto> get(Long userId) {
-        return null;
+    public List<Item> getAll(Long userId) {
+        return items.values()
+                .stream()
+                .filter(item -> item.getOwner().getId().equals(userId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ItemDto get(Long userId, Long itemId) {
-        return null;
+    public Item get(Long itemId) {
+        return items.get(itemId);
     }
 
     @Override
-    public ItemDto search(Long userId, String text) {
-        return null;
+    public List<Item> search(String text) {
+        return items.values()
+                .stream()
+                .filter(Item::getAvailable)
+                .filter(item -> item.getName().toLowerCase().contains(text) || item.getDescription().toLowerCase().contains(text))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ItemDto add(Long userId, ItemDto itemDto) {
-        return null;
+    public Item add(Item item) {
+        item.setId(itemId++);
+        items.put(item.getId(), item);
+        log.debug("Вещь добавлена {}", item);
+        return item;
     }
 
     @Override
-    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
-        return null;
+    public Item update(Item item) {
+        Item newItem = get(item.getId());
+        if (isOwner(newItem, item.getOwner().getId())) {
+            String message = String.format("Пользователь с ID = %d не владелец ITEM = %s", item.getOwner().getId(), item.getName());
+            log.debug(message);
+            throw new ObjectDoesNotExist(message);
+        }
+        newItem.setName(Objects.requireNonNullElse(item.getName(), newItem.getName()));
+        newItem.setDescription(Objects.requireNonNullElse(item.getDescription(), newItem.getDescription()));
+        if (item.getAvailable() != null) {
+            newItem.setAvailable(item.getAvailable());
+        }
+        items.put(newItem.getId(), newItem);
+        return newItem;
+    }
+
+    private boolean isOwner(Item item, Long userId) {
+        return item == null || !item.getOwner().getId().equals(userId);
     }
 }

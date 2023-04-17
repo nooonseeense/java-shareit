@@ -20,23 +20,21 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDto> get(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Запрос GET: get(Long userId) на получение списка вещей пользователя с ID {}.", userId);
-        return itemService.get(userId);
+    public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("Запрос GET: getAll(Long userId) на получение списка вещей пользователя с ID {}.", userId);
+        return itemService.getAll(userId);
     }
 
     @GetMapping("{itemId}")
-    public ItemDto get(@RequestHeader("X-Sharer-User-Id") Long userId,
-                       @PositiveOrZero @PathVariable Long itemId) {
-        log.info("Запрос GET: get(Long userId, Long itemId) на получение вещи по ID = {}.", itemId);
-        return itemService.get(userId, itemId);
+    public ItemDto get(@PositiveOrZero @PathVariable Long itemId) {
+        log.info("Запрос GET: get(Long itemId) на получение вещи по ID = {}.", itemId);
+        return itemService.get(itemId);
     }
 
     @GetMapping("/search")
-    public ItemDto search(@RequestHeader("X-Sharer-User-Id") Long userId,
-                          @RequestParam(name = "text") String text) {
-        log.info("Запрос GET: search(Long userId, String text) на поиск вещи доступные для аренды, text = {}", text);
-        return itemService.search(userId, text);
+    public List<ItemDto> search(@RequestParam String text) {
+        log.info("Запрос GET: search(String text) на поиск вещи доступные для аренды, text = {}", text);
+        return itemService.search(text);
     }
 
     @PostMapping
@@ -49,7 +47,7 @@ public class ItemController {
     @PatchMapping("{itemId}")
     public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
                           @PositiveOrZero @PathVariable Long itemId,
-                          @Valid @RequestBody ItemDto itemDto) {
+                          @RequestBody ItemDto itemDto) {
         log.info("Запрос PATCH: update(Long userId, Long itemId, ItemDto itemDto) на изменение вещи пользователю с ID = {}", userId);
         return itemService.update(userId, itemId, itemDto);
     }

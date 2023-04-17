@@ -1,17 +1,17 @@
 package ru.practicum.shareit.item.repository;
 
-import ru.practicum.shareit.item.model.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
 public interface ItemRepository {
-    List<ItemDto> get(Long userId);
+    List<Item> getAll(Long userId);
 
-    ItemDto get(Long userId, Long itemId);
+    Item get(Long itemId);
 
-    ItemDto search(Long userId, String text);
+    List<Item> search(String text);
 
-    ItemDto add(Long userId, ItemDto itemDto);
+    Item add(Item item);
 
-    ItemDto update(Long userId, Long itemId, ItemDto itemDto);
+    Item update(Item itemDto);
 }

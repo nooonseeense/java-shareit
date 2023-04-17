@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface ItemService {
 
-    List<ItemDto> get(Long userId);
+    List<ItemDto> getAll(Long userId);
 
-    ItemDto get(Long userId, Long itemId);
+    ItemDto get(Long itemId);
 
-    ItemDto search(Long userId, String text);
+    List<ItemDto> search(String text);
 
     ItemDto add(Long userId, ItemDto itemDto);
 
