@@ -16,7 +16,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleUserValidationException(final UserValidationException e) {
-        String message ="Ошибка при валидации пользователя.";
+        String message = "Ошибка при валидации пользователя.";
         log.warn(message);
         return Map.of(message, e.getMessage());
     }
@@ -48,7 +48,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        String message ="Ошибка при валидации данных.";
+        String message = "Ошибка при валидации данных.";
         log.warn(message);
         return Map.of(message, e.getMessage());
     }
