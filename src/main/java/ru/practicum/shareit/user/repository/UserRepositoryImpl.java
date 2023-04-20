@@ -3,9 +3,8 @@ package ru.practicum.shareit.user.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.ObjectDoesNotExist;
-import ru.practicum.shareit.exception.UserEmailValidationException;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.model.dto.UserDto;
 
 import java.util.*;
 
@@ -22,46 +21,34 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User get(Long id) {
-        return Optional.ofNullable(users.get(id))
-                .orElseThrow(() -> new ObjectDoesNotExist(String.format("Пользователь с ID %d не найден.", id))
-        );
+    public Optional<User> get(Long id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public User create(User user) {
-        if (validationEmail(user)) {
-            String message = String.format("Такой email уже используется: '%s'", user.getEmail());
-            log.debug(message);
-            throw new UserEmailValidationException(message);
-        }
         user.setId(userId++);
         users.put(user.getId(), user);
-        log.debug("Пользователь создан {}", user);
+        log.debug("Пользователь создан {}", user.getId());
         return user;
     }
 
     @Override
-    public User update(User user) {
-        if (validationEmail(user)) {
-            String message = String.format("Такой email уже используется: '%s'", user.getEmail());
-            log.debug(message);
-            throw new UserEmailValidationException(message);
+    public User update(Long userId, UserDto userDto) {
+        User userToUpdate = users.get(userId);
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            userToUpdate.setName(userDto.getName());
         }
-        users.put(user.getId(), user);
-        log.debug("Пользователь обновлен {}", user);
-        return user;
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            userToUpdate.setEmail(userDto.getEmail());
+        }
+        log.debug("Пользователь обновлен {}", userToUpdate.getId());
+        return userToUpdate;
     }
 
     @Override
     public void delete(Long id) {
         users.remove(id);
         log.debug("Пользователь с ID = {} удален", id);
-    }
-
-    private boolean validationEmail(User user) {
-        return users.values()
-                .stream()
-                .anyMatch(u -> u.getEmail().equals(user.getEmail()) && !Objects.equals(u.getId(), user.getId()));
     }
 }

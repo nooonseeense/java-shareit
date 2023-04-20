@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.model.dto.UserDto;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.controller.marker.Marker;
 
-import javax.validation.Valid;
+import ru.practicum.shareit.user.model.dto.UserDto;
+import ru.practicum.shareit.user.service.UserService;
+
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -18,36 +18,38 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 public class UserController {
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
     @GetMapping
-    public List<User> get() {
+    public List<UserDto> get() {
         log.info("Запрос GET: get() на получение списка всех пользователей.");
-        return userServiceImpl.get();
+        return userService.get();
     }
 
     @GetMapping("{id}")
     public UserDto get(@PositiveOrZero @PathVariable Long id) {
         log.info("Запрос GET: get(Long id) на получение пользователя по ID = {}.", id);
-        return userServiceImpl.get(id);
+        return userService.get(id);
     }
 
+
     @PostMapping()
-    public UserDto create(@Valid @RequestBody UserDto userDto) {
+    public UserDto create(@RequestBody @Validated(Marker.OnCreate.class) UserDto userDto) {
         log.info("Запрос POST: create(UserDto userDto) на создание пользователя.");
-        return userServiceImpl.create(userDto);
+        return userService.create(userDto);
     }
+
 
     @PatchMapping("{id}")
     public UserDto update(@PathVariable Long id,
-                          @RequestBody UserDto userDto) {
+                          @Validated(Marker.OnUpdate.class) @RequestBody UserDto userDto) {
         log.info("Запрос PATCH: update(Long id, UserDto userDto) на изменение пользователя.");
-        return userServiceImpl.update(id, userDto);
+        return userService.update(id, userDto);
     }
 
     @DeleteMapping("{id}")
     public void delete(@PositiveOrZero @PathVariable Long id) {
         log.info("Запрос DELETE: delete(Long id) на удаление пользователя с ID = {}.", id);
-        userServiceImpl.delete(id);
+        userService.delete(id);
     }
 }
