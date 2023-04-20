@@ -17,7 +17,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleUserValidationException(final UserValidationException e) {
         String message = "Ошибка при валидации пользователя.";
-        log.warn(message);
+        log.warn(message, e.getMessage());
         return Map.of(message, e.getMessage());
     }
 
@@ -25,7 +25,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleUserEmailValidationException(final UserEmailValidationException e) {
         String message = "Ошибка при валидации email пользователя.";
-        log.warn(message);
+        log.warn(message, e.getMessage());
         return Map.of(message, e.getMessage());
     }
 
@@ -33,7 +33,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleObjectDoesNotExistException(final ObjectDoesNotExist e) {
         String message = "Запрашиваемый объект не найден.";
-        log.warn(message);
+        log.warn(message, e.getMessage());
         return Map.of(message, e.getMessage());
     }
 
@@ -41,7 +41,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleThrowableException(final Throwable e) {
         String message = "Сервер столкнулся с неожиданной ошибкой, которая помешала выполнить запрос.";
-        log.warn(message);
+        log.warn(message, e.getMessage());
         return Map.of(message, e.getMessage());
     }
 
@@ -49,7 +49,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         String message = "Ошибка при валидации данных.";
-        log.warn(message);
+        log.warn(message, e.getMessage());
         return Map.of(message, e.getMessage());
     }
 }

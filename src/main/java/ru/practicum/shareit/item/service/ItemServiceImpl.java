@@ -12,7 +12,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> search(String text) {
         if (text.isBlank()) {
-            return new ArrayList<>();
+            return List.of();
         }
         return itemRepository.search(text.toLowerCase())
                 .stream()
@@ -57,14 +56,23 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
-        Item oldItem = itemRepository.get(itemId)
-                .orElseThrow(() -> new ObjectDoesNotExist(String.format("Вещь с ID = %d не найдена", itemId)));
-        if (!oldItem.getOwner().getId().equals(userId)) {
+    public ItemDto update(Long userId, Long itemId, ItemDto newItem) {
+        ItemDto item = get(itemId);
+        if (!item.getOwner().getId().equals(userId)) {
             String message = String.format("Пользователь с ID = %d не владеет вещью с ID = %d", userId, itemId);
             log.debug(message);
             throw new ObjectDoesNotExist(message);
         }
-        return ItemMapper.toItemDto(itemRepository.update(oldItem, itemDto));
+        if (newItem.getName() != null && !newItem.getName().isBlank()) {
+            item.setName(newItem.getName());
+        }
+        if (newItem.getDescription() != null && !newItem.getDescription().isBlank()) {
+            item.setDescription(newItem.getDescription());
+        }
+        if (newItem.getAvailable() != null) {
+            item.setAvailable(newItem.getAvailable());
+        }
+        log.debug("Вещь обновлена {}", item.getId());
+        return item;
     }
 }

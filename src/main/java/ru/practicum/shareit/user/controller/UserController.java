@@ -13,7 +13,6 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
-@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")

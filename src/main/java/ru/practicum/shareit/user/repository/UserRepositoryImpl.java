@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.model.dto.UserDto;
 
 import java.util.*;
 
@@ -31,19 +30,6 @@ public class UserRepositoryImpl implements UserRepository {
         users.put(user.getId(), user);
         log.debug("Пользователь создан {}", user.getId());
         return user;
-    }
-
-    @Override
-    public User update(Long userId, UserDto userDto) {
-        User userToUpdate = users.get(userId);
-        if (userDto.getName() != null && !userDto.getName().isBlank()) {
-            userToUpdate.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            userToUpdate.setEmail(userDto.getEmail());
-        }
-        log.debug("Пользователь обновлен {}", userToUpdate.getId());
-        return userToUpdate;
     }
 
     @Override

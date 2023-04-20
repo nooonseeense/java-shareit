@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.dto.ItemDto;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +16,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> getAll(Long userId) {
-        return userItemIndex.get(userId);
+        return userItemIndex.getOrDefault(userId, List.of());
     }
 
     @Override
@@ -42,19 +41,5 @@ public class ItemRepositoryImpl implements ItemRepository {
         items.add(item);
         log.debug("Вещь добавлена ID = {}", item.getId());
         return item;
-    }
-
-    @Override
-    public Item update(Item oldItem, ItemDto newItem) {
-        if (newItem.getName() != null && !newItem.getName().isBlank()) {
-            oldItem.setName(newItem.getName());
-        }
-        if (newItem.getDescription() != null && !newItem.getDescription().isBlank()) {
-            oldItem.setDescription(newItem.getDescription());
-        }
-        if (newItem.getAvailable() != null) {
-            oldItem.setAvailable(newItem.getAvailable());
-        }
-        return oldItem;
     }
 }
