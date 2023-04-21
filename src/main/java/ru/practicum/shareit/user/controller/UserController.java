@@ -31,13 +31,11 @@ public class UserController {
         return userService.get(id);
     }
 
-
     @PostMapping()
     public UserDto create(@RequestBody @Validated(Marker.OnCreate.class) UserDto userDto) {
         log.info("Запрос POST: create(UserDto userDto) на создание пользователя.");
         return userService.create(userDto);
     }
-
 
     @PatchMapping("{id}")
     public UserDto update(@PathVariable Long id,
