@@ -57,7 +57,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto update(Long userId, Long itemId, ItemDto newItem) {
-        ItemDto item = get(itemId);
+        Item item = itemRepository.get(itemId)
+                .orElseThrow(() -> new ObjectDoesNotExist(String.format("Пользователь с ID %d не найден.", userId)));
         if (!item.getOwner().getId().equals(userId)) {
             String message = String.format("Пользователь с ID = %d не владеет вещью с ID = %d", userId, itemId);
             log.debug(message);
@@ -73,6 +74,6 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(newItem.getAvailable());
         }
         log.debug("Вещь обновлена {}", item.getId());
-        return item;
+        return ItemMapper.toItemDto(item);
     }
 }

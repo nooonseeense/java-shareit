@@ -38,18 +38,17 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDto update(Long id, UserDto userDto) {
-        UserDto user = get(id);
+        User user = userRepository.get(id)
+                .orElseThrow(() -> new ObjectDoesNotExist(String.format("Пользователь с ID %d не найден.", id)));
         if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
             validateEmail(userDto.getEmail(), false, id);
+            user.setEmail(userDto.getEmail());
         }
         if (userDto.getName() != null && !userDto.getName().isBlank()) {
             user.setName(userDto.getName());
         }
-        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            user.setEmail(userDto.getEmail());
-        }
         log.debug("Пользователь обновлен {}", user.getId());
-        return user;
+        return UserMapper.toUserDto(user);
     }
 
     public void delete(Long id) {
