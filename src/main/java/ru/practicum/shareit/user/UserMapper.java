@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.model.entity.User;
 import ru.practicum.shareit.user.model.dto.UserDto;
 
 @UtilityClass

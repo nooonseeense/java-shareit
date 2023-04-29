@@ -1,24 +1,24 @@
-package ru.practicum.shareit.booking.model.dto;
+package ru.practicum.shareit.item.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.enumeration.Status;
 import ru.practicum.shareit.item.model.entity.Item;
 import ru.practicum.shareit.user.model.entity.User;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingDto {
+public class CommentDto {
     private Long id;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    @NotBlank
+    private String text;
     private Item item;
-    private User booker;
-    private Status status;
+    private User author;
+    private LocalDateTime created;
 }

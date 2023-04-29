@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import ru.practicum.shareit.exception.ObjectDoesNotExist;
 import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.entity.Item;
 import ru.practicum.shareit.item.model.dto.ItemDto;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.UserMapper;
