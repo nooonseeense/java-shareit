@@ -20,8 +20,9 @@ public class ItemRequest {
     @Column(nullable = false)
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "requestor_id", nullable = false)
+    @JoinColumn(name = "requestor_id", referencedColumnName = "id")
     @ToString.Exclude
     private User requestor;
+    @Column
     private LocalDateTime created;
 }

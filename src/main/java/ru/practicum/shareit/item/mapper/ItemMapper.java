@@ -1,8 +1,8 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.item.model.entity.Item;
-import ru.practicum.shareit.item.model.dto.ItemDto;
+import ru.practicum.shareit.item.model.entity.item.Item;
+import ru.practicum.shareit.item.model.dto.item.ItemDto;
 
 @UtilityClass
 public class ItemMapper {

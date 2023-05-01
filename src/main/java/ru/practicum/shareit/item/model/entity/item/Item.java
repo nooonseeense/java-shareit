@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.model.entity;
+package ru.practicum.shareit.item.model.entity.item;
 
 import lombok.*;
 import ru.practicum.shareit.request.model.entity.ItemRequest;
@@ -23,7 +23,7 @@ public class Item {
     @Column(nullable = false)
     private Boolean available;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    @JoinColumn(name = "owner_id")
     @ToString.Exclude
     private User owner;
     @ManyToOne(fetch = FetchType.LAZY)

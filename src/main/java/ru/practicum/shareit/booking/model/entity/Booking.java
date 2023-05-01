@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking.model.entity;
 
 import lombok.*;
 import ru.practicum.shareit.booking.enumeration.Status;
-import ru.practicum.shareit.item.model.entity.Item;
+import ru.practicum.shareit.item.model.entity.item.Item;
 import ru.practicum.shareit.user.model.entity.User;
 
 import javax.persistence.*;

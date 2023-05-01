@@ -1,10 +1,10 @@
-package ru.practicum.shareit.item.model.dto;
+package ru.practicum.shareit.item.model.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.model.entity.Item;
+import ru.practicum.shareit.item.model.entity.item.Item;
 import ru.practicum.shareit.user.model.entity.User;
 
 import javax.validation.constraints.NotBlank;
