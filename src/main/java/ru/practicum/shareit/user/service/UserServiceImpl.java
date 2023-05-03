@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.handler.ObjectDoesNotExist;
 import ru.practicum.shareit.user.exception.UserEmailValidationException;
 import ru.practicum.shareit.user.model.entity.User;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
+    @Override
+    @Transactional(readOnly = true)
     public List<UserDto> get() {
         return userRepository.findAll()
                 .stream()
@@ -26,16 +29,22 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public UserDto get(Long id) {
         return UserMapper.toUserDto(userRepository.findById(id)
                 .orElseThrow(() -> new ObjectDoesNotExist(String.format("Пользователь с ID %d не найден.", id))));
     }
 
+    @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
         //validateEmail(userDto.getEmail(), true, null);
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
+    @Override
+    @Transactional
     public UserDto update(Long id, UserDto userDto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ObjectDoesNotExist(String.format("Пользователь с ID %d не найден.", id)));
@@ -50,6 +59,8 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toUserDto(user);
     }
 
+    @Override
+    @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
     }

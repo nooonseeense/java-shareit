@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.mapper;
+package ru.practicum.shareit.item.mapper.item;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.model.entity.item.Item;
