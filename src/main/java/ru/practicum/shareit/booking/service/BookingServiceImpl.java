@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    private final Sort SORT = Sort.by(Sort.Direction.DESC, "start");
+    private final Sort sort = Sort.by(Sort.Direction.DESC, "start");
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final ItemService itemService;
@@ -51,32 +51,32 @@ public class BookingServiceImpl implements BookingService {
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
-                return bookingRepository.findAllByBookerId(userId, SORT)
+                return bookingRepository.findAllByBookerId(userId, sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case CURRENT:
-                return bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), SORT)
+                return bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), SORT)
+                return bookingRepository.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case FUTURE:
-                return bookingRepository.findAllByBookerIdAndStartIsAfter(userId, LocalDateTime.now(), SORT)
+                return bookingRepository.findAllByBookerIdAndStartIsAfter(userId, LocalDateTime.now(), sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatus(userId, Status.WAITING, SORT)
+                return bookingRepository.findAllByBookerIdAndStatus(userId, Status.WAITING, sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatus(userId, Status.REJECTED, SORT)
+                return bookingRepository.findAllByBookerIdAndStatus(userId, Status.REJECTED, sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
@@ -91,32 +91,32 @@ public class BookingServiceImpl implements BookingService {
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
-                return bookingRepository.findAllByItemOwnerId(userId, SORT)
+                return bookingRepository.findAllByItemOwnerId(userId, sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case CURRENT:
-                return bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), SORT)
+                return bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findAllByItemOwnerIdAndEndIsBefore(userId, LocalDateTime.now(), SORT)
+                return bookingRepository.findAllByItemOwnerIdAndEndIsBefore(userId, LocalDateTime.now(), sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case FUTURE:
-                return bookingRepository.findAllByItemOwnerIdAndStartIsAfter(userId, LocalDateTime.now(), SORT)
+                return bookingRepository.findAllByItemOwnerIdAndStartIsAfter(userId, LocalDateTime.now(), sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.WAITING, SORT)
+                return bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.WAITING, sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.REJECTED, SORT)
+                return bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.REJECTED, sort)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
