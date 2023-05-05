@@ -2,6 +2,9 @@ package ru.practicum.shareit.item.model.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @Builder
@@ -10,8 +13,10 @@ import lombok.*;
 @EqualsAndHashCode
 public class ItemDto {
     private Long id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
-    private boolean isAvailable;
-    private Long requestId;
+    @NotNull
+    private Boolean available;
 }

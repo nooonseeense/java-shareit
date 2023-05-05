@@ -1,46 +1,40 @@
 package ru.practicum.shareit.user.repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.model.dto.UserDto;
 
 import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class UserRepositoryImpl implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
-    private Long generatorId = 1L;
+    private Long userId = 1L;
 
     @Override
     public List<User> get() {
-        return List.copyOf(users.values());
+        return new ArrayList<>(users.values());
     }
 
     @Override
-    public User get(Long id) {
-        return users.get(id);
+    public Optional<User> get(Long id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public User create(UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
-        user.setId(generatorId++);
+    public User create(User user) {
+        user.setId(userId++);
         users.put(user.getId(), user);
-        return user;
-    }
-
-    @Override
-    public User update(UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
-        users.put(user.getId(), user);
+        log.debug("Пользователь создан {}", user.getId());
         return user;
     }
 
     @Override
     public void delete(Long id) {
         users.remove(id);
+        log.debug("Пользователь с ID = {} удален", id);
     }
 }

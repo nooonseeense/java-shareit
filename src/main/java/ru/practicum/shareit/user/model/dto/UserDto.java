@@ -1,9 +1,11 @@
 package ru.practicum.shareit.user.model.dto;
 
 import lombok.*;
+import ru.practicum.shareit.user.controller.marker.Marker;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
@@ -13,9 +15,9 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode
 public class UserDto {
     private Long id;
-    @NotBlank(message = "Имя не может быть пустым.")
+    @NotBlank(groups = {Marker.OnCreate.class})
     private String name;
-    @Email(message = "Электронная почта не может быть пустой и должна содержать символ @.")
-    @NotBlank
+    @Email(groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
+    @NotEmpty(groups = {Marker.OnCreate.class})
     private String email;
 }

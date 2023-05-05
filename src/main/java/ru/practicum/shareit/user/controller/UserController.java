@@ -4,24 +4,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.controller.marker.Marker;
+
 import ru.practicum.shareit.user.model.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
-@Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping(path = "/users")
 public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<User> get() {
+    public List<UserDto> get() {
         log.info("Запрос GET: get() на получение списка всех пользователей.");
         return userService.get();
     }
@@ -33,15 +32,16 @@ public class UserController {
     }
 
     @PostMapping()
-    public UserDto create(@Valid @RequestBody UserDto userDto) {
+    public UserDto create(@RequestBody @Validated(Marker.OnCreate.class) UserDto userDto) {
         log.info("Запрос POST: create(UserDto userDto) на создание пользователя.");
         return userService.create(userDto);
     }
 
-    @PutMapping
-    public UserDto update(@Valid @RequestBody UserDto userDto) {
-        log.info("Запрос PUT: update(UserDto userDto) на изменение пользователя.");
-        return userService.update(userDto);
+    @PatchMapping("{id}")
+    public UserDto update(@PathVariable Long id,
+                          @Validated(Marker.OnUpdate.class) @RequestBody UserDto userDto) {
+        log.info("Запрос PATCH: update(Long id, UserDto userDto) на изменение пользователя.");
+        return userService.update(id, userDto);
     }
 
     @DeleteMapping("{id}")
