@@ -50,9 +50,9 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingDto approve(@PositiveOrZero @PathVariable Long bookingId,
-                              @RequestParam Boolean isApproved,
+                              @RequestParam Boolean approved,
                               @RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Запрос PATCH: approve(Long bookingId, Boolean isApproved, Long userId) на подтверждение или отклонения запроса на бронирование.");
-        return bookingService.approve(bookingId, isApproved, userId);
+        log.info("Запрос PATCH: approve(Long bookingId, Boolean approved, Long userId) на подтверждение или отклонения запроса на бронирование.");
+        return bookingService.approve(bookingId, approved, userId);
     }
 }

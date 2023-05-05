@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.enumeration.Status;
 import ru.practicum.shareit.booking.model.entity.Booking;
+import ru.practicum.shareit.item.model.entity.item.Item;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -32,4 +32,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItemOwnerIdAndStartIsAfter(Long bookerId, LocalDateTime start, Sort sort);
 
     List<Booking> findAllByItemOwnerIdAndStatus(Long bookerId, Status status, Sort sort);
+
+    List<Booking> findAllByBookerIdAndItemIdAndStatusAndEndBefore(Long userId, Long itemId, Status status, LocalDateTime end);
+
+    List<Booking> findAllByItemInAndStatus(List<Item> items, Status status);
 }

@@ -23,6 +23,5 @@ public class ItemRequest {
     @JoinColumn(name = "requestor_id", referencedColumnName = "id")
     @ToString.Exclude
     private User requestor;
-    @Column
     private LocalDateTime created;
 }

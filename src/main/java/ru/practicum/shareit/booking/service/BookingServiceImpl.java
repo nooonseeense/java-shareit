@@ -7,18 +7,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enumeration.State;
 import ru.practicum.shareit.booking.enumeration.Status;
-import ru.practicum.shareit.handler.ObjectDoesNotExist;
-import ru.practicum.shareit.item.exception.ItemNotAvailableException;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
+import ru.practicum.shareit.error.exception.BadRequestException;
+import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.dto.BookingDto;
 import ru.practicum.shareit.booking.model.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.entity.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.entity.item.Item;
-import ru.practicum.shareit.item.repository.item.ItemRepository;
+import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.entity.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,16 +30,16 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
     private final static Sort SORT = Sort.by(Sort.Direction.DESC, "start");
     private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
+    private final UserService userService;
+    private final ItemService itemService;
 
     @Override
     @Transactional(readOnly = true)
     public BookingDto get(Long bookingId, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ObjectDoesNotExist("Бронирование найдено"));
-        checkUserForDb(userId);
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование найдено"));
+
         if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
-            throw new ObjectDoesNotExist("Бронирование не найдено");
+            throw new NotFoundException("Бронирование не найдено");
         }
         return BookingMapper.toBookingDto(booking);
     }
@@ -47,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public List<BookingDto> get(String state, Long userId) {
-        checkUserForDb(userId);
+        userService.get(userId);
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
@@ -87,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForAllOwnerItems(String state, Long userId) {
-        checkUserForDb(userId);
+        userService.get(userId);
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
@@ -133,11 +133,14 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRequestDto.getStart().equals(bookingRequestDto.getEnd())) {
             throw new IllegalArgumentException("Дата окончания не может быть равна даты начала бронирования.");
         }
-        User user = userRepository.findById(userId).orElseThrow(() -> new ObjectDoesNotExist("Пользователь не найден."));
-        Item item = itemRepository.findById(bookingRequestDto.getItemId()).orElseThrow(() -> new ItemNotFoundException("Вещь не найдена."));
+        User user = UserMapper.toUser(userService.get(userId));
+        Item item = itemService.get(bookingRequestDto.getItemId());
 
+        if (user.getId().equals(item.getOwner().getId())) {
+            throw new NotFoundException("Вещь недоступна для бронирования.");
+        }
         if (!item.getAvailable()) {
-            throw new ItemNotAvailableException("Вещь недоступна для бронирования.");
+            throw new BadRequestException("Вещь недоступна для бронирования.");
         }
         Booking booking = bookingRepository.save(BookingMapper.toBooking(bookingRequestDto, item, user));
         log.debug("Бронирование вещи с ID = {} создано.", booking.getId());
@@ -146,14 +149,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto approve(Long bookingId, Boolean isApproved, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ObjectDoesNotExist("Бронирование найдено"));
+    public BookingDto approve(Long bookingId, Boolean approved, Long userId) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование найдено"));
+        userService.get(userId);
 
-        checkUserForDb(userId);
-        if (!booking.getStatus().equals(Status.WAITING)) {
-            throw new IllegalArgumentException("Бронирование уже существует.");
+        if (!booking.getItem().getOwner().getId().equals(userId)) {
+            throw new NotFoundException("Бронирование не найдено.");
         }
-        if (isApproved) {
+        if (!booking.getStatus().equals(Status.WAITING)) {
+            throw new BadRequestException("Бронирование уже существует.");
+        }
+        if (approved) {
             booking.setStatus(Status.APPROVED);
         } else {
             booking.setStatus(Status.REJECTED);
@@ -162,15 +168,11 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
-    private void checkUserForDb(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new ObjectDoesNotExist("Пользователь не найден."));
-    }
-
     private void validState(String state) {
         try {
             State.valueOf(state);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Такой статус не существует.");
+            throw new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 }
