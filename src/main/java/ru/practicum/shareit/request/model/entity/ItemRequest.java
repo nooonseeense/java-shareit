@@ -7,10 +7,11 @@ import ru.practicum.shareit.user.model.entity.User;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "requests")
 public class ItemRequest {

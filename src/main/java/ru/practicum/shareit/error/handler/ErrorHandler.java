@@ -39,4 +39,11 @@ public class ErrorHandler {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleInternalServerErrorException(final Exception e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 }

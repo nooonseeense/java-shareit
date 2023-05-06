@@ -150,7 +150,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto approve(Long bookingId, Boolean approved, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование найдено"));
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Бронирование найдено"));
         userService.get(userId);
 
         if (!booking.getItem().getOwner().getId().equals(userId)) {
@@ -165,7 +166,7 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(Status.REJECTED);
         }
         log.debug("Бронирование вещи с ID = {} подтверждено.", booking.getId());
-        return BookingMapper.toBookingDto(bookingRepository.save(booking));
+        return BookingMapper.toBookingDto(booking);
     }
 
     private void validState(String state) {

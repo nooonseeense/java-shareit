@@ -12,7 +12,7 @@ import ru.practicum.shareit.user.model.entity.User;
 @UtilityClass
 public class BookingMapper {
 
-    public static BookingDto toBookingDto(Booking booking) {
+    public BookingDto toBookingDto(Booking booking) {
         if (booking == null) {
             return null;
         }
@@ -26,7 +26,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public static Booking toBooking(BookingRequestDto bookingRequestDto, Item item, User user) {
+    public Booking toBooking(BookingRequestDto bookingRequestDto, Item item, User user) {
         return Booking.builder()
                 .start(bookingRequestDto.getStart())
                 .end(bookingRequestDto.getEnd())
@@ -35,7 +35,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public static BookingShortDto toShortDto(Booking booking) {
+    public BookingShortDto toShortDto(Booking booking) {
         if (booking == null) {
             return null;
         }

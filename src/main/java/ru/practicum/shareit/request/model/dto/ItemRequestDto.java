@@ -5,10 +5,11 @@ import ru.practicum.shareit.user.model.entity.User;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemRequestDto {
     private Long id;
     private String description;
