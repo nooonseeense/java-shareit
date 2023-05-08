@@ -10,7 +10,7 @@ import ru.practicum.shareit.booking.enumeration.Status;
 import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
-import ru.practicum.shareit.booking.model.dto.BookingDto;
+import ru.practicum.shareit.booking.model.dto.BookingFullResponseDto;
 import ru.practicum.shareit.booking.model.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.entity.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -35,7 +35,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public BookingDto get(Long bookingId, Long userId) {
+    public BookingFullResponseDto get(Long bookingId, Long userId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование найдено"));
 
         if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
@@ -46,7 +46,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> get(String state, Long userId) {
+    public List<BookingFullResponseDto> get(String state, Long userId) {
         userService.get(userId);
         validState(state);
         switch (State.valueOf(state)) {
@@ -86,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getBookingsForAllOwnerItems(String state, Long userId) {
+    public List<BookingFullResponseDto> getBookingsForAllOwnerItems(String state, Long userId) {
         userService.get(userId);
         validState(state);
         switch (State.valueOf(state)) {
@@ -126,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto add(BookingRequestDto bookingRequestDto, Long userId) {
+    public BookingFullResponseDto add(BookingRequestDto bookingRequestDto, Long userId) {
         if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd())) {
             throw new IllegalArgumentException("Дата окончания не может быть раньше даты начала бронирования.");
         }
@@ -149,7 +149,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto approve(Long bookingId, Boolean approved, Long userId) {
+    public BookingFullResponseDto approve(Long bookingId, Boolean approved, Long userId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование найдено"));
         userService.get(userId);

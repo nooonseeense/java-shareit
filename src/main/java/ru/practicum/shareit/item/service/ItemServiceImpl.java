@@ -14,6 +14,7 @@ import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.item.mapper.comment.CommentMapper;
 import ru.practicum.shareit.item.mapper.item.ItemMapper;
 import ru.practicum.shareit.item.model.dto.comment.CommentDto;
+import ru.practicum.shareit.item.model.dto.item.ItemShortDto;
 import ru.practicum.shareit.item.model.entity.comment.Comment;
 import ru.practicum.shareit.item.model.entity.item.Item;
 import ru.practicum.shareit.item.model.dto.item.ItemDto;
@@ -100,22 +101,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> search(String text) {
+    public List<ItemShortDto> search(String text) {
         if (text.isBlank()) {
             return List.of();
         }
         return itemRepository.findAllByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper::toItemShortDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public ItemDto add(Long userId, ItemDto itemDto) {
-        Item item = ItemMapper.toItem(itemDto);
-        item.setOwner(UserMapper.toUser(userService.get(userId)));
-        return ItemMapper.toItemDto(itemRepository.save(item));
+    public ItemShortDto add(Long userId, ItemShortDto itemShortDto) {
+        User user = UserMapper.toUser(userService.get(userId));
+        Item item = ItemMapper.toItem(itemShortDto, user);
+        itemRepository.save(item);
+        return ItemMapper.toItemShortDto(item);
     }
 
     @Override
@@ -140,7 +142,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto update(Long userId, Long itemId, ItemDto newItem) {
+    public ItemShortDto update(Long userId, Long itemId, ItemShortDto newItem) {
         userService.get(userId);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID %d не найден.", itemId)));
@@ -159,7 +161,7 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(newItem.getAvailable());
         }
         log.debug("Вещь обновлена {}", item.getId());
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        return ItemMapper.toItemShortDto(itemRepository.save(item));
     }
 
     private List<ItemDto> setBookingsAndComment(List<Item> items,

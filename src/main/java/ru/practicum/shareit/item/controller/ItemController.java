@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.model.dto.comment.CommentDto;
 import ru.practicum.shareit.item.model.dto.item.ItemDto;
+import ru.practicum.shareit.item.model.dto.item.ItemShortDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -35,16 +36,16 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
+    public List<ItemShortDto> search(@RequestParam String text) {
         log.info("Запрос GET: search(String text) на поиск вещи доступные для аренды, text = {}", text);
         return itemService.search(text);
     }
 
     @PostMapping
-    public ItemDto add(@RequestHeader(HEADER_USER) Long userId,
-                       @Valid @RequestBody ItemDto itemDto) {
+    public ItemShortDto add(@RequestHeader(HEADER_USER) Long userId,
+                            @Valid @RequestBody ItemShortDto itemShortDto) {
         log.info("Запрос POST: add(Long userId, ItemDto itemDto) на добавление вещи пользователю с ID = {}", userId);
-        return itemService.add(userId, itemDto);
+        return itemService.add(userId, itemShortDto);
     }
 
     @PostMapping("/{itemId}/comment")
@@ -56,10 +57,10 @@ public class ItemController {
     }
 
     @PatchMapping("{itemId}")
-    public ItemDto update(@RequestHeader(HEADER_USER) Long userId,
+    public ItemShortDto update(@RequestHeader(HEADER_USER) Long userId,
                           @PositiveOrZero @PathVariable Long itemId,
-                          @RequestBody ItemDto itemDto) {
+                          @RequestBody ItemShortDto itemShortDto) {
         log.info("Запрос PATCH: update(Long userId, Long itemId, ItemDto itemDto) на изменение вещи пользователю с ID = {}", userId);
-        return itemService.update(userId, itemId, itemDto);
+        return itemService.update(userId, itemId, itemShortDto);
     }
 }
