@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.model.dto.comment.CommentDto;
+import ru.practicum.shareit.item.model.dto.comment.CommentShortDto;
 import ru.practicum.shareit.item.model.dto.item.ItemDto;
 import ru.practicum.shareit.item.model.dto.item.ItemShortDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -51,9 +52,9 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestHeader(HEADER_USER) Long userId,
                                  @PathVariable Long itemId,
-                                 @Valid @RequestBody CommentDto commentDto) {
+                                 @Valid @RequestBody CommentShortDto commentShortDto) {
         log.info("Запрос POST: addComment(Long userId, Long itemId) на добавление комментария к вещи по ID = {}", itemId);
-        return itemService.addComment(userId, itemId, commentDto);
+        return itemService.addComment(userId, itemId, commentShortDto);
     }
 
     @PatchMapping("{itemId}")

@@ -14,6 +14,7 @@ import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.item.mapper.comment.CommentMapper;
 import ru.practicum.shareit.item.mapper.item.ItemMapper;
 import ru.practicum.shareit.item.model.dto.comment.CommentDto;
+import ru.practicum.shareit.item.model.dto.comment.CommentShortDto;
 import ru.practicum.shareit.item.model.dto.item.ItemShortDto;
 import ru.practicum.shareit.item.model.entity.comment.Comment;
 import ru.practicum.shareit.item.model.entity.item.Item;
@@ -49,7 +50,17 @@ public class ItemServiceImpl implements ItemService {
 
         Map<Item, List<Booking>> bookings = bookingRepository.findAllByItemInAndStatus(items, Status.APPROVED)
                 .stream()
-                .collect(Collectors.groupingBy(Booking::getItem, Collectors.toList()));
+                .collect(Collectors.groupingBy(
+                                Booking::getItem,
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        list -> {
+                                            list.sort(Comparator.comparing(Booking::getStart).reversed());
+                                            return list;
+                                        }
+                                )
+                        )
+                );
 
         Map<Item, List<Comment>> comments = commentRepository.findAllByItemIdIn(items
                         .stream()
@@ -81,15 +92,19 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> bookings = bookingRepository.findAllByItemInAndStatus(Collections.singletonList(item), Status.APPROVED);
         LocalDateTime localDateTime = LocalDateTime.now();
 
-        itemDto.setLastBooking(BookingMapper.toShortDto(bookings.stream()
-                .filter(booking -> (booking.getStart().isBefore(localDateTime)))
-                .max(Comparator.comparing(Booking::getStart))
-                .orElse(null)));
+        itemDto.setLastBooking(BookingMapper.toShortDto(
+                bookings.stream()
+                        .sorted(Comparator.comparing(Booking::getEnd).reversed())
+                        .filter(booking -> booking.getStart().isBefore(localDateTime))
+                        .findFirst()
+                        .orElse(null)));
 
-        itemDto.setNextBooking(BookingMapper.toShortDto(bookings.stream()
-                .filter(booking -> (booking.getStart().isAfter(localDateTime)))
-                .min(Comparator.comparing(Booking::getStart))
-                .orElse(null)));
+        itemDto.setNextBooking(BookingMapper.toShortDto(
+                bookings.stream()
+                        .sorted(Comparator.comparing(Booking::getEnd))
+                        .filter(booking -> booking.getStart().isAfter(localDateTime))
+                        .findFirst()
+                        .orElse(null)));
         return itemDto;
     }
 
@@ -122,7 +137,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
+    public CommentDto addComment(Long userId, Long itemId, CommentShortDto commentShortDto) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID %d не найдена.", userId)));
         User user = UserMapper.toUser(userService.get(userId));
@@ -134,7 +149,7 @@ public class ItemServiceImpl implements ItemService {
                 LocalDateTime.now())) {
             throw new IllegalArgumentException(String.format("Вещь с ID = %d не бралась пользователем с ID = %s в аренду.", itemId, userId));
         }
-        Comment comment = CommentMapper.toComment(commentDto, item, user);
+        Comment comment = CommentMapper.toComment(commentShortDto, item, user);
         commentRepository.save(comment);
         log.debug("Комментарий добавлен к вещи c ID = {}", item.getId());
         return CommentMapper.toCommentDto(comment);
@@ -177,7 +192,7 @@ public class ItemServiceImpl implements ItemService {
                 itemDto.setLastBooking(BookingMapper.toShortDto(Objects.requireNonNull(bookings.get(item)
                         .stream()
                         .filter(booking -> !booking.getStart().isAfter(localDateTime))
-                        .max(Comparator.comparing(Booking::getStart))
+                        .findFirst()
                         .orElse(null))));
 
                 itemDto.setNextBooking(BookingMapper.toShortDto(Objects.requireNonNull(bookings.get(item)
