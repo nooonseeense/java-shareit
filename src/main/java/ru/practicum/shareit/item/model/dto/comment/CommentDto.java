@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.model.dto.comment;
 
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Getter
