@@ -27,7 +27,6 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -87,7 +86,7 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setLastBooking(BookingMapper.toShortDto(
                         bookings.stream()
                                 .filter(booking -> !booking.getStart().isAfter(localDateTime))
-                                .max(Comparator.comparing(Booking::getEnd))
+                                .findFirst()
                                 .orElse(null)
                 )
         );
@@ -95,7 +94,7 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setNextBooking(BookingMapper.toShortDto(
                         bookings.stream()
                                 .filter(booking -> booking.getStart().isAfter(localDateTime))
-                                .min(Comparator.comparing(Booking::getEnd))
+                                .reduce((first, second) -> second)
                                 .orElse(null)
                 )
         );
@@ -191,7 +190,7 @@ public class ItemServiceImpl implements ItemService {
                 itemDto.setNextBooking(BookingMapper.toShortDto(bookings.get(item)
                                 .stream()
                                 .filter(booking -> booking.getStart().isAfter(localDateTime))
-                                .reduce(BinaryOperator.minBy(Comparator.comparing(Booking::getStart)))
+                                .reduce((first, second) -> second)
                                 .orElse(null)
                         )
                 );
