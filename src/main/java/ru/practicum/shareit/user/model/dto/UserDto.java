@@ -10,9 +10,8 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@AllArgsConstructor
 public class UserDto {
     private Long id;
     @NotBlank(groups = {Marker.OnCreate.class})
