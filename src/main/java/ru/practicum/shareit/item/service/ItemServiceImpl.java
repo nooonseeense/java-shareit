@@ -2,8 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +27,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -50,29 +49,17 @@ public class ItemServiceImpl implements ItemService {
         userService.get(userId);
 
         List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
-        List<ItemDto> itemsDto = new ArrayList<>();
 
         Map<Item, List<Booking>> bookings = bookingRepository.findAllByItemInAndStatus(items, Status.APPROVED, SORT_START_DESC)
                 .stream()
                 .collect(Collectors.groupingBy(Booking::getItem));
+
         Map<Item, List<Comment>> comments = commentRepository.findAllByItemIdIn(items
                         .stream()
                         .map(Item::getId).collect(Collectors.toList()), SORT_CREATED_DESC)
                 .stream()
                 .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
-
-        for (Item item : items) {
-            ItemDto itemDto = ItemMapper.toItemDto(item);
-
-            if (bookings.get(item) != null) {
-                setBookings(itemDto, item);
-            }
-            if (comments.get(item) != null) {
-                setComments(itemDto);
-            }
-            itemsDto.add(itemDto);
-        }
-        return itemsDto;
+        return setBookingsAndComment(items, bookings, comments);
     }
 
     @Override
@@ -83,11 +70,35 @@ public class ItemServiceImpl implements ItemService {
         Item item = get(itemId);
         ItemDto itemDto = ItemMapper.toItemDto(item);
 
-        setComments(itemDto);
+        itemDto.setComments(commentRepository.findAllByItemIdIn(
+                        Collections.singletonList(itemDto.getId()), SORT_CREATED_DESC)
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList())
+        );
+
         if (!item.getOwner().getId().equals(userId)) {
             return itemDto;
         }
-        setBookings(itemDto, item);
+
+        List<Booking> bookings = bookingRepository.findAllByItemInAndStatus(Collections.singletonList(item), Status.APPROVED, SORT_START_DESC);
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        itemDto.setLastBooking(BookingMapper.toShortDto(
+                        bookings.stream()
+                                .filter(booking -> !booking.getStart().isAfter(localDateTime))
+                                .max(Comparator.comparing(Booking::getEnd))
+                                .orElse(null)
+                )
+        );
+
+        itemDto.setNextBooking(BookingMapper.toShortDto(
+                        bookings.stream()
+                                .filter(booking -> booking.getStart().isAfter(localDateTime))
+                                .min(Comparator.comparing(Booking::getEnd))
+                                .orElse(null)
+                )
+        );
         return itemDto;
     }
 
@@ -159,23 +170,40 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemShortDto(itemRepository.save(item));
     }
 
-    private void setBookings(ItemDto itemDto, Item item) {
+    private List<ItemDto> setBookingsAndComment(List<Item> items,
+                                                Map<Item, List<Booking>> bookings,
+                                                Map<Item, List<Comment>> comments) {
+        List<ItemDto> itemsDto = new ArrayList<>();
         LocalDateTime localDateTime = LocalDateTime.now();
-        Pageable limitOne = PageRequest.of(0, 1);
 
-        List<Booking> lastBookingList = bookingRepository.findLastBookingByItemAndStatus(
-                item, Status.APPROVED, localDateTime, limitOne);
-        List<Booking> nextBookingList = bookingRepository.findNextBookingByItemAndStatus(
-                item, Status.APPROVED, localDateTime, limitOne);
+        for (Item item : items) {
+            ItemDto itemDto = ItemMapper.toItemDto(item);
 
-        itemDto.setLastBooking(BookingMapper.toShortDto(lastBookingList.isEmpty() ? null : lastBookingList.get(0)));
-        itemDto.setNextBooking(BookingMapper.toShortDto(nextBookingList.isEmpty() ? null : nextBookingList.get(0)));
-    }
+            if (bookings.get(item) != null) {
+                itemDto.setLastBooking(BookingMapper.toShortDto(bookings.get(item)
+                                .stream()
+                                .filter(booking -> !booking.getStart().isAfter(localDateTime))
+                                .findFirst()
+                                .orElse(null)
+                        )
+                );
 
-    private void setComments(ItemDto itemDto) {
-        itemDto.setComments(commentRepository.findAllByItemIdIn(Collections.singletonList(itemDto.getId()), SORT_CREATED_DESC)
-                .stream()
-                .map(CommentMapper::toCommentDto)
-                .collect(Collectors.toList()));
+                itemDto.setNextBooking(BookingMapper.toShortDto(bookings.get(item)
+                                .stream()
+                                .filter(booking -> booking.getStart().isAfter(localDateTime))
+                                .reduce(BinaryOperator.minBy(Comparator.comparing(Booking::getStart)))
+                                .orElse(null)
+                        )
+                );
+            }
+            if (comments.get(item) != null) {
+                itemDto.setComments(comments.get(item)
+                        .stream()
+                        .map(CommentMapper::toCommentDto)
+                        .collect(Collectors.toList()));
+            }
+            itemsDto.add(itemDto);
+        }
+        return itemsDto;
     }
 }
