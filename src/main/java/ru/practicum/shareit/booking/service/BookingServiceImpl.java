@@ -50,22 +50,23 @@ public class BookingServiceImpl implements BookingService {
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerId(userId, sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByBookerId(userId, sort));
             case CURRENT:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfter
-                        (userId, LocalDateTime.now(), LocalDateTime.now(), sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort));
             case PAST:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndEndIsBefore
-                        (userId, LocalDateTime.now(), sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), sort));
             case FUTURE:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStartIsAfter
-                        (userId, LocalDateTime.now(), sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByBookerIdAndStartIsAfter(userId, LocalDateTime.now(), sort));
             case WAITING:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStatus
-                        (userId, Status.WAITING, sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByBookerIdAndStatus(userId, Status.WAITING, sort));
             case REJECTED:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStatus
-                        (userId, Status.REJECTED, sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByBookerIdAndStatus(userId, Status.REJECTED, sort));
         }
         return List.of();
     }
@@ -77,22 +78,23 @@ public class BookingServiceImpl implements BookingService {
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerId(userId, sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByItemOwnerId(userId, sort));
             case CURRENT:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter
-                        (userId, LocalDateTime.now(), LocalDateTime.now(), sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort));
             case PAST:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndEndIsBefore
-                        (userId, LocalDateTime.now(), sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByItemOwnerIdAndEndIsBefore(userId, LocalDateTime.now(), sort));
             case FUTURE:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStartIsAfter
-                        (userId, LocalDateTime.now(), sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByItemOwnerIdAndStartIsAfter(userId, LocalDateTime.now(), sort));
             case WAITING:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStatus
-                        (userId, Status.WAITING, sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByItemOwnerIdAndStatus(userId, Status.WAITING, sort));
             case REJECTED:
-                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStatus
-                        (userId, Status.REJECTED, sort));
+                return BookingMapper.toBookingFullResponseDto(bookingRepository
+                        .findAllByItemOwnerIdAndStatus(userId, Status.REJECTED, sort));
         }
         return List.of();
     }
