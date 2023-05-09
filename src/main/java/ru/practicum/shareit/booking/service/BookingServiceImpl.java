@@ -22,7 +22,6 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,7 +35,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public BookingFullResponseDto get(Long bookingId, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование найдено"));
+        Booking booking = get(bookingId);
 
         if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
             throw new NotFoundException("Бронирование не найдено");
@@ -51,35 +50,22 @@ public class BookingServiceImpl implements BookingService {
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
-                return bookingRepository.findAllByBookerId(userId, sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerId(userId, sort));
             case CURRENT:
-                return bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfter
+                        (userId, LocalDateTime.now(), LocalDateTime.now(), sort));
             case PAST:
-                return bookingRepository.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndEndIsBefore
+                        (userId, LocalDateTime.now(), sort));
             case FUTURE:
-                return bookingRepository.findAllByBookerIdAndStartIsAfter(userId, LocalDateTime.now(), sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStartIsAfter
+                        (userId, LocalDateTime.now(), sort));
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatus(userId, Status.WAITING, sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStatus
+                        (userId, Status.WAITING, sort));
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatus(userId, Status.REJECTED, sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByBookerIdAndStatus
+                        (userId, Status.REJECTED, sort));
         }
         return List.of();
     }
@@ -91,35 +77,22 @@ public class BookingServiceImpl implements BookingService {
         validState(state);
         switch (State.valueOf(state)) {
             case ALL:
-                return bookingRepository.findAllByItemOwnerId(userId, sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerId(userId, sort));
             case CURRENT:
-                return bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter
+                        (userId, LocalDateTime.now(), LocalDateTime.now(), sort));
             case PAST:
-                return bookingRepository.findAllByItemOwnerIdAndEndIsBefore(userId, LocalDateTime.now(), sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndEndIsBefore
+                        (userId, LocalDateTime.now(), sort));
             case FUTURE:
-                return bookingRepository.findAllByItemOwnerIdAndStartIsAfter(userId, LocalDateTime.now(), sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStartIsAfter
+                        (userId, LocalDateTime.now(), sort));
             case WAITING:
-                return bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.WAITING, sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStatus
+                        (userId, Status.WAITING, sort));
             case REJECTED:
-                return bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.REJECTED, sort)
-                        .stream()
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
+                return BookingMapper.toBookingFullResponseDto(bookingRepository.findAllByItemOwnerIdAndStatus
+                        (userId, Status.REJECTED, sort));
         }
         return List.of();
     }
@@ -150,8 +123,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingFullResponseDto approve(Long bookingId, Boolean approved, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Бронирование найдено"));
+        Booking booking = get(bookingId);
         userService.get(userId);
 
         if (!booking.getItem().getOwner().getId().equals(userId)) {
@@ -175,5 +147,9 @@ public class BookingServiceImpl implements BookingService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS");
         }
+    }
+
+    private Booking get(Long bookingId) {
+        return bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование найдено"));
     }
 }

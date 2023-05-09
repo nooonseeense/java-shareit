@@ -9,6 +9,9 @@ import ru.practicum.shareit.booking.model.entity.Booking;
 import ru.practicum.shareit.item.model.entity.item.Item;
 import ru.practicum.shareit.user.model.entity.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @UtilityClass
 public class BookingMapper {
 
@@ -46,11 +49,18 @@ public class BookingMapper {
                 .build();
     }
 
-    private static BookingFullResponseDto.Item toItemDto(Item item) {
+    public List<BookingFullResponseDto> toBookingFullResponseDto(List<Booking> bookings) {
+        return bookings
+                .stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
+    }
+
+    private BookingFullResponseDto.Item toItemDto(Item item) {
         return new BookingFullResponseDto.Item(item.getId(), item.getName());
     }
 
-    private static BookingFullResponseDto.User toUserDto(User user) {
+    private BookingFullResponseDto.User toUserDto(User user) {
         return new BookingFullResponseDto.User(user.getId(), user.getName());
     }
 }

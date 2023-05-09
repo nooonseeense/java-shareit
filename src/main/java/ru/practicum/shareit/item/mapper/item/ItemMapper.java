@@ -6,6 +6,9 @@ import ru.practicum.shareit.item.model.entity.item.Item;
 import ru.practicum.shareit.item.model.dto.item.ItemDto;
 import ru.practicum.shareit.user.model.entity.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @UtilityClass
 public class ItemMapper {
 
@@ -36,5 +39,12 @@ public class ItemMapper {
                 .available(item.getAvailable())
                 .requestId(item.getId())
                 .build();
+    }
+
+    public List<ItemShortDto> toItemShortDto(List<Item> items) {
+        return items
+                .stream()
+                .map(ItemMapper::toItemShortDto)
+                .collect(Collectors.toList());
     }
 }
