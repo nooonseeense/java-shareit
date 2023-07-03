@@ -47,14 +47,14 @@ Getting a list of user items
 Create a review for an item
 
 ### User service
-POST /users 
+**POST /users**
 Adding a user
 
-PATCH /users/{id}
+**PATCH /users/{id}**
 User change
 
-GET /users/{id}
+**GET /users/{id}**
 Getting a specific user
 
-GET /users
+**GET /users**
 Getting a list of all users
